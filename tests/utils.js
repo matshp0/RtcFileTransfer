@@ -19,13 +19,12 @@ export const awaitAllDownloads = async (page, dir) => {
 }
 
 export const createFile = async (name, dir, size) => {
-  fs.open(path.join(dir, name), 'w', (err, fd) => {
-    if (err) throw err
-    fs.ftruncate(fd, size, (err) => {
-      if (err) throw err
-      fs.close(fd, (err) => {
-        if (err) throw err
-      })
-    })
-  })
+  const filePath = path.join(dir, name);
+  try {
+    const handle = await fs.promises.open(filePath, 'w');
+    await handle.truncate(size);
+    await handle.close();
+  } catch (err) {
+    throw err;
+  }
 }

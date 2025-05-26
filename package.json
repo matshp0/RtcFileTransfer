@@ -24,16 +24,18 @@
     "streamsaver": "^2.0.6"
   },
   "devDependencies": {
-    "svelte-spa-router": "^4.0.1",
+    "@playwright/test": "^1.52.0",
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^22.15.21",
     "rollup": "^4.27.3",
     "rollup-plugin-circular-dependencies": "^1.1.2",
     "rollup-plugin-css-only": "^4.5.2",
     "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-svelte": "^7.2.2",
-    "svelte": "^5.2.7"
+    "svelte": "^5.2.7",
+    "svelte-spa-router": "^4.0.1"
   }
 }

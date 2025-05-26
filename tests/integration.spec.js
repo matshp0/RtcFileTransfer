@@ -1,6 +1,6 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
-import { createFile, awaitAllDownlads } from './utils';
+import { createFile, awaitAllDownloads } from './utils';
 import fs from 'node:fs'
 
 let inputDir, outputDir;
@@ -30,7 +30,7 @@ test('upload and download files', async ({ page, context }) => {
   const receivePage = await context.newPage();
   await receivePage.goto(url);
   await receivePage.getByRole('button', { name: 'Download files' }).click();
-  const receivedFiles = await awaitAllDownlads(receivePage, outputDir);
+  const receivedFiles = await awaitAllDownloads(receivePage, outputDir);
   expect(receivedFiles).toEqual(files);
 });
 

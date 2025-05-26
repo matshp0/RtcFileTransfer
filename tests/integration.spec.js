@@ -22,7 +22,7 @@ test.beforeAll(async ({ }, testInfo) => {
   }
 })
 
-test('updload and download files', async ({ page, context }) => {
+test('upload and download files', async ({ page, context }) => {
   await page.goto('/');
   await page.setInputFiles('#file-input', files.map(({ name }) => `${inputDir}/${name}`));
   await page.getByText('Start Transfer').click();

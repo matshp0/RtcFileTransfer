@@ -12,6 +12,7 @@ export const awaitAllDownloads = async (page, dir) => {
       const filePath = await download.path();
       const stats = fs.statSync(filePath);
       result.push({ name, size: stats.size });
+      if (timeout) clearTimeout(timeout);
       timeout = setTimeout(() => resolve(result), 1000);
     })
   })

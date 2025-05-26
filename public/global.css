@@ -1,0 +1,68 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%; /* Ensure full viewport height */
+}
+
+body {
+	font-family: Arial, sans-serif;
+	display: flex;
+	justify-content: center;  /* Center horizontally */
+	align-items: flex-start;  /* Align items to the top (adjusting for 20% offset) */
+	background-color: #f8f9fa;
+	padding-top: 10%; /* Adds 20% padding from the top */
+}
+
+
+
+
+
+a {
+	color: rgb(0,100,200);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:visited {
+	color: rgb(0,80,160);
+}
+
+label {
+	display: block;
+}
+
+input, button, select, textarea {
+	font-family: inherit;
+	font-size: inherit;
+	-webkit-padding: 0.4em 0;
+	padding: 0.4em;
+	margin: 0 0 0.5em 0;
+	box-sizing: border-box;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+}
+
+input:disabled {
+	color: #ccc;
+}
+
+button {
+	color: #333;
+	background-color: #f4f4f4;
+	outline: none;
+}
+
+button:disabled {
+	color: #999;
+}
+
+button:not(:disabled):active {
+	background-color: #ddd;
+}
+
+button:focus {
+	border-color: #666;
+}

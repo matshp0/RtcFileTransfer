@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-export const awaitAllDownlads = async (page, dir) => {
+export const awaitAllDownloads = async (page, dir) => {
   const result = [];
   return new Promise((resolve) => {
     let timeout = null;

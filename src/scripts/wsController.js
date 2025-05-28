@@ -47,8 +47,9 @@ export default class WSController {
     } catch (err) {
       console.log(err);
       console.log('ERROR:', err.message);
-      socket.send(JSON.stringify(
-        { 'event': 'ERROR', payload: { msg: err.message } }));
+      socket.send(
+        JSON.stringify({ event: 'ERROR', payload: { msg: err.message } })
+      );
     }
   }
 }

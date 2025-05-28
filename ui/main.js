@@ -1,8 +1,8 @@
-import App from './App.svelte'
+import App from './App.svelte';
 import { mount } from 'svelte';
 
 const app = mount(App, {
-  target: document.body
+  target: document.body,
 });
 
-export default app
+export default app;

@@ -14,20 +14,29 @@ export default class RtcClient extends EventTarget {
       negotiated: true,
       id: 0,
     });
-    this.dataChannel.binaryType = "arraybuffer";
+    this.dataChannel.binaryType = 'arraybuffer';
     this.peerConnection.onicecandidate = this.onCandidateDiscovery.bind(this);
-    this.dataChannel.addEventListener('open', event => {
-      const openChannelEvent = new Event('dataChannelOpen');
-      this.dispatchEvent(openChannelEvent);
-    }, { once: true });
+    this.dataChannel.addEventListener(
+      'open',
+      (event) => {
+        const openChannelEvent = new Event('dataChannelOpen');
+        this.dispatchEvent(openChannelEvent);
+      },
+      { once: true }
+    );
   }
 
   async onCandidateDiscovery(event) {
     if (event.candidate) {
-      this.socket.send(JSON.stringify({
-        event: 'ICE_CANDIDATE',
-        payload: { candidate: event.candidate, destination: this.destination }
-      }));
+      this.socket.send(
+        JSON.stringify({
+          event: 'ICE_CANDIDATE',
+          payload: {
+            candidate: event.candidate,
+            destination: this.destination,
+          },
+        })
+      );
     }
   }
 
@@ -38,12 +47,13 @@ export default class RtcClient extends EventTarget {
       await this.peerConnection.setRemoteDescription(offer);
       const answer = await this.peerConnection.createAnswer();
       await this.peerConnection.setLocalDescription(answer);
-      socket.send(JSON.stringify({
-        event: 'RTC_ANSWER',
-        payload: { answer, destination: this.destination }
-      }));
-    }
-    catch (e) {
+      socket.send(
+        JSON.stringify({
+          event: 'RTC_ANSWER',
+          payload: { answer, destination: this.destination },
+        })
+      );
+    } catch (e) {
       console.error('Error creating answer', e);
     }
   }
@@ -61,11 +71,12 @@ export default class RtcClient extends EventTarget {
   async createOffer() {
     const offer = await this.peerConnection.createOffer();
     await this.peerConnection.setLocalDescription(offer);
-    this.socket.send(JSON.stringify({
-      event: 'RTC_OFFER',
-      payload: { offer, destination: this.destination }
-    }));
-
+    this.socket.send(
+      JSON.stringify({
+        event: 'RTC_OFFER',
+        payload: { offer, destination: this.destination },
+      })
+    );
   }
 
   async onAnswer(socket, data) {
@@ -82,12 +93,16 @@ export default class RtcClient extends EventTarget {
 
   awaitReadyState() {
     return new Promise((resolve) => {
-      this.dataChannel.addEventListener('message', event => {
-        const message = event.data;
-        if (message === 'READY') {
-          resolve();
-        }
-      }, { once: true });
+      this.dataChannel.addEventListener(
+        'message',
+        (event) => {
+          const message = event.data;
+          if (message === 'READY') {
+            resolve();
+          }
+        },
+        { once: true }
+      );
     });
   }
   async sendFiles(files) {
@@ -96,10 +111,9 @@ export default class RtcClient extends EventTarget {
       const { signal } = skipController;
       console.log('awaiting ready state');
       await this.awaitReadyState();
-      await this.sendFile(file, signal)
-        .catch((e) => {
-          console.log("Error sending file:", e);
-        });
+      await this.sendFile(file, signal).catch((e) => {
+        console.log('Error sending file:', e);
+      });
     }
   }
 
@@ -110,24 +124,9 @@ export default class RtcClient extends EventTarget {
       let offset = 0;
 
       signal.addEventListener('abort', () => {
-        reader = null
+        reader = null;
         reject('File transfer aborted');
       });
-
-      reader.onload = async (event) => {
-        if (signal.aborted) return;
-        const data = event.target.result;
-        console.log(`Sending ${data.byteLength} bytes, sent: ${offset / CHUNK_SIZE}`);
-        await waitForBufferedAmount(this.dataChannel);
-        this.dataChannel.send(data);
-        offset += data.byteLength;
-        readNextChunk();
-      };
-
-      reader.onerror = (event) => {
-        console.error('FileReader error', event.target.error);
-        throw event.target.error;
-      };
 
       const readNextChunk = () => {
         if (signal.aborted) return;
@@ -141,15 +140,31 @@ export default class RtcClient extends EventTarget {
         }
       };
 
-      const waitForBufferedAmount = () => {
-        return new Promise((resolve) => {
-          if (this.dataChannel.bufferedAmount < THRESHOLD) {
-            resolve();
-          } else {
-            setTimeout(() => waitForBufferedAmount().then(resolve), 10);
-          }
-        });
+      const waitForBufferedAmount = () => new Promise((resolve) => {
+        if (this.dataChannel.bufferedAmount < THRESHOLD) {
+          resolve();
+        } else {
+          setTimeout(() => waitForBufferedAmount().then(resolve), 10);
+        }
+      });
+      reader.onload = async (event) => {
+        if (signal.aborted) return;
+        const data = event.target.result;
+        console.log(
+          `Sending ${data.byteLength} bytes, sent: ${offset / CHUNK_SIZE}`
+        );
+        await waitForBufferedAmount(this.dataChannel);
+        this.dataChannel.send(data);
+        offset += data.byteLength;
+        readNextChunk();
       };
+
+      reader.onerror = (event) => {
+        console.error('FileReader error', event.target.error);
+        throw event.target.error;
+      };
+
+
       readNextChunk();
     });
   }
@@ -174,13 +189,13 @@ export default class RtcClient extends EventTarget {
         fileStream.abort();
         writer.abort();
         reject();
-      }
+      };
       signal.addEventListener('abort', abortHandler);
       window.onunload = abortHandler;
       this.dataChannel.onmessage = (event) => {
-        console.log(event)
+        console.log(event);
         const message = event.data;
-        console.log("Message: ", message)
+        console.log('Message: ', message);
         console.log('Received chunk', message.length);
         if (message === 'EOF') {
           writer.close();
@@ -190,7 +205,7 @@ export default class RtcClient extends EventTarget {
         const uint8chunk = new Uint8Array(message);
         console.log(uint8chunk);
         writer.write(uint8chunk);
-      }
+      };
     });
   }
 }

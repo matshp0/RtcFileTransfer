@@ -1,14 +1,9 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
 import Fastify from 'fastify';
 import serveStatic from './plugins/frontend.js';
 import fastifyWebsocket from '@fastify/websocket';
 import AutoLoad from '@fastify/autoload';
 import { join } from 'desm';
 import dotenv from 'dotenv';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: join(import.meta.url, '..', '.env') });
 
@@ -19,11 +14,9 @@ const fastify = Fastify({
 fastify.register(fastifyWebsocket);
 fastify.register(serveStatic);
 
-
-console.log(import.meta.url);
 fastify.register(AutoLoad, {
   dir: join(import.meta.url, 'routes'),
-  dirNameRoutePrefix: false
+  dirNameRoutePrefix: false,
 });
 
 fastify.listen(

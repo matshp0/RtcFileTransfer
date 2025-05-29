@@ -7,15 +7,15 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: join(import.meta.url, '..', '.env') });
 
-export const fastify = Fastify({
-  logger: true,
-});
+export function makeApp(fastify) {
+  fastify.register(fastifyWebsocket);
+  fastify.register(serveStatic);
 
-fastify.register(fastifyWebsocket);
-fastify.register(serveStatic);
+  fastify.register(AutoLoad, {
+    dir: join(import.meta.url, 'routes'),
+    dirNameRoutePrefix: false,
+  });
+  return fastify;
+}
 
-fastify.register(AutoLoad, {
-  dir: join(import.meta.url, 'routes'),
-  dirNameRoutePrefix: false,
-});
-
+export const app = makeApp(Fastify());

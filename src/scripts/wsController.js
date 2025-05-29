@@ -36,7 +36,6 @@ export default class WSController {
       const message = JSON.parse(data);
       const { event, payload } = message;
       const { handler, validate } = this.events.get(event) ?? {};
-      console.log('event:', event);
       if (!handler) {
         throw new Error('Event not found');
       }
@@ -45,8 +44,6 @@ export default class WSController {
       }
       handler(socket, payload);
     } catch (err) {
-      console.log(err);
-      console.log('ERROR:', err.message);
       socket.send(
         JSON.stringify({ event: 'ERROR', payload: { msg: err.message } })
       );

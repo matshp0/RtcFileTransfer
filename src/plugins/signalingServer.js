@@ -4,11 +4,13 @@ import WSController from '../scripts/wsController.js';
 import S from 'fluent-json-schema';
 import generateKey from '../scripts/generateKey.js';
 
+
+const DESTINATION_NOT_FOUND = 'destination not found';
+
 const signalingServer = async (fastify) => {
   const clients = new BiMap();
 
   const onClose = (socket) => {
-    console.log('Connection closed');
     clients.delete(socket);
   };
   const wsConnection = new WSController({ onClose });
@@ -26,11 +28,14 @@ const signalingServer = async (fastify) => {
       const { offer, destination } = data;
       const origin = clients.get(socket);
       const toSocket = clients.getKey(destination);
-      if (toSocket) {
-        toSocket.send(
-          JSON.stringify({ event: 'RTC_OFFER', payload: { offer, origin } })
+      if (!toSocket) {
+        socket.send(
+          JSON.stringify({ event: 'ERROR', payload: { msg: DESTINATION_NOT_FOUND } })
         );
       }
+      toSocket.send(
+        JSON.stringify({ event: 'RTC_OFFER', payload: { offer, origin } })
+      );
     }
   ); // sent by the client to initiate a rtc connection
 
@@ -46,11 +51,13 @@ const signalingServer = async (fastify) => {
     (socket, data) => {
       const { answer, destination } = data;
       const toSocket = clients.getKey(destination);
-      if (toSocket) {
-        toSocket.send(
-          JSON.stringify({ event: 'RTC_ANSWER', payload: { answer } })
+      if (!toSocket) {
+        socket.send(
+          JSON.stringify({ event: 'ERROR', payload: { msg: DESTINATION_NOT_FOUND } })
         );
       }
+      toSocket.send(
+        JSON.stringify({ event: 'RTC_ANSWER', payload: { answer } }));
     }
   ); // sent by the host to the client in answer to RTC OFFER
 
@@ -67,14 +74,16 @@ const signalingServer = async (fastify) => {
       const { candidate, destination } = data;
       const toSocket = clients.getKey(destination);
       const origin = clients.get(socket);
-      if (toSocket) {
-        toSocket.send(
-          JSON.stringify({
-            event: 'ICE_CANDIDATE',
-            payload: { candidate, origin },
-          })
+      if (!toSocket) {
+        socket.send(
+          JSON.stringify({ event: 'ERROR', payload: { msg: DESTINATION_NOT_FOUND } })
         );
       }
+      toSocket.send(
+        JSON.stringify({
+          event: 'ICE_CANDIDATE',
+          payload: { candidate, origin }
+        }));
     }
   ); // sent by both the client and the host to exchange ice candidates
 
@@ -129,7 +138,7 @@ const signalingServer = async (fastify) => {
         socket.send(
           JSON.stringify({
             event: 'ERROR',
-            payload: { msg: 'No destination found' },
+            payload: { msg: DESTINATION_NOT_FOUND },
           })
         );
         return;

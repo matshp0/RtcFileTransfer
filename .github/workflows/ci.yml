@@ -7,50 +7,31 @@ on:
     branches: [ main ]
 
 jobs:
-  lint:
+build-and-test:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run lint
 
-  test:
-    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm test
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
 
-  build:
-    needs: [lint, test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: 🟢 Use Node.js 20
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build
-      - name: Build Docker image
-        run: docker build -t rtc-file-transfer .
 
-  e2e:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run e2e_test 
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧹 Lint code
+        run: npm run lint
+
+      - name: 🛠️ Build project
+        run: npm run build
+
+      - name: 🧪 Run unit tests
+        run: npm run test
+        env:
+          NODE_OPTIONS: '--experimental-vm-modules'
+
+      - name: 🧪 Run E2E tests (Playwright in Docker)
+        run: npm run e2e_test

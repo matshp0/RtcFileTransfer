@@ -4,3 +4,10 @@
 .DS_Store
 run.bat
 .env
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

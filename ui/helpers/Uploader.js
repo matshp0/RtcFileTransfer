@@ -14,29 +14,33 @@ export default class Uploader {
     }
   }
 
-  onOpen () {
+  onOpen() {
     this.setEvents();
     this.getSocketId();
   }
 
-  getSocketId () {
+  getSocketId() {
     this.socket.send(JSON.stringify({ event: 'GET_SOCKET_ID' }));
   }
 
-  setEvents () {
+  setEvents() {
     this.wsController.addEvent('JOIN_REQUEST', async (socket, data) => {
       const { origin } = data;
       const client = new RtcClient(this.socket, origin);
-      client.addEventListener('dataChannelOpen',  () => {
+      client.addEventListener('dataChannelOpen', () => {
         client.sendFiles(this.files);
       });
       this.rtcClients.set(origin, client);
       const metadata = this.files.map(({ name, size }) => ({ name, size }));
-      socket.send(JSON.stringify({ event: 'FILE_METADATA',
-        payload: { destination: origin, files: metadata } }));
+      socket.send(
+        JSON.stringify({
+          event: 'FILE_METADATA',
+          payload: { destination: origin, files: metadata },
+        })
+      );
     });
 
-    this.wsController.addEvent('RTC_OFFER',  async (socket, data) => {
+    this.wsController.addEvent('RTC_OFFER', async (socket, data) => {
       const { origin } = data;
       const client = this.rtcClients.get(origin);
       if (!client) {
@@ -46,7 +50,7 @@ export default class Uploader {
       await client.onOffer(socket, data);
     });
 
-    this.wsController.addEvent('ICE_CANDIDATE',  async (socket, data) => {
+    this.wsController.addEvent('ICE_CANDIDATE', async (socket, data) => {
       const { origin } = data;
       const client = this.rtcClients.get(origin);
       if (!client) {
@@ -62,5 +66,5 @@ export default class Uploader {
     });
 
     this.wsController.listen(this.socket);
-    }
+  }
 }

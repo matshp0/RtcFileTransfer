@@ -10,7 +10,7 @@
     "start": "rollup -c && node ./server.js",
     "serve": "node ./server.js",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
-    "e2e_test": "docker build -f Dockerfile.test -t 'playwright-test' . && docker run playwright-test"
+    "test:e2e": "docker build -f Dockerfile.test -t 'playwright-test' . && docker run playwright-test"
   },
   "dependencies": {
     "@fastify/autoload": "^6.0.2",

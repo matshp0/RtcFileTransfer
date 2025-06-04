@@ -15,4 +15,4 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/src ./src
 COPY server.js ./
 EXPOSE 8000
-CMD ["npm", "run", "start"] 
+CMD ["npm", "run", "serve"] 

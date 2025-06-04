@@ -34,4 +34,4 @@ jobs:
             NODE_OPTIONS: '--experimental-vm-modules'
   
         - name: 🧪 Run E2E tests (Playwright in Docker)
-        run: npm run test:e2e
+          run: npm run test:e2e
